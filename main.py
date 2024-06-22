@@ -36,18 +36,25 @@ async def command_start_handler(message: Message) -> None:
 async def voice_message_handler(message: Message) -> None:
     try:
         if message.content_type == ContentType.VOICE:
+            logging.info('start working with voice')
             file_id = message.voice.file_id
             voice = await message.bot.get_file(file_id)
+            logging.info('voice uploaded')
             path_on_disk = f"voices/{file_id}.ogg"
             file_on_disk = Path("", path_on_disk)
             await message.bot.download_file(voice.file_path, destination=file_on_disk)
+            logging.info('voice file downloaded')
 
             message_text = voice_to_text(path_on_disk)
             model.submit_message(message_text)
+            logging.info(f'voice text is {message_text}')
             reply_text = model.get_reply()
+            logging.info(f'voice reply is {reply_text}')
             reply_speech = model.get_speech(reply_text)
+            logging.info('reply converted to voice')
             reply_on_disk = f'voice_replies/{file_id}_reply.ogg'
             reply_speech.write_to_file(reply_on_disk)
+            logging.info('voice reply wrote to file')
 
             await message.bot.send_voice(
                 chat_id=message.chat.id,
@@ -55,6 +62,7 @@ async def voice_message_handler(message: Message) -> None:
                     path=reply_on_disk
                 )
             )
+            logging.info('voice sent')
         else:
             await message.answer("Лучше отправь голосовое сообщение, друг!")
     except TypeError:
