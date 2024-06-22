@@ -35,9 +35,6 @@ class OpenAIModel:
                 run_id=self.run.id,
             )
             time.sleep(0.5)
-
-        print('Error: ')
-        print(self.run.last_error)
         res = self.get_list()
         return res.data[0].content[0].text.value
 
@@ -46,6 +43,14 @@ class OpenAIModel:
             model="tts-1",
             voice="alloy",
             input=message
+        )
+
+        return res
+
+    def get_text(self, voice_path: str):
+        res = self.client.audio.transcriptions.create(
+            file=open(voice_path, 'rb'),
+            model="whisper-1"
         )
 
         return res

@@ -4,7 +4,6 @@ import sys
 from pathlib import Path
 
 from openai_model import OpenAIModel
-from voice_to_text import voice_to_text
 
 from pydantic_settings import BaseSettings
 from pydantic import Field
@@ -45,7 +44,7 @@ async def voice_message_handler(message: Message) -> None:
             await message.bot.download_file(voice.file_path, destination=file_on_disk)
             logging.info('voice file downloaded')
 
-            message_text = voice_to_text(path_on_disk)
+            message_text = model.get_text(path_on_disk).text
             model.submit_message(message_text)
             logging.info(f'voice text is {message_text}')
             reply_text = model.get_reply()
